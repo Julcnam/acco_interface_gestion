@@ -1,0 +1,14 @@
+selenium
+pathlib
+duckdb
+pandas
+numpy
+lxml
+docx2pdf
+streamlit
+streamlit[pdf]
+streamlit-aggrid
+python-docx
+alive-progress
+boto3
+botocore
