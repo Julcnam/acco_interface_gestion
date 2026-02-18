@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+import sys
 
 # Créer le cvs depuis la base de données sql
 def get_csv(conn):
@@ -197,6 +199,14 @@ def get_csv(conn):
 
     accords_infos["siren"] = accords_infos["siret"].astype(str).str[:9]
 
-    accords_infos.to_csv("Csv/métadonnées.csv",index=False)
+    
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    bdd_dir = os.path.join(base_dir, "Csv")
+    os.makedirs(bdd_dir, exist_ok=True)  # crée le dossier si absent
+    # Chemin complet vers le csv
+    db_path = os.path.join(bdd_dir, "métadonnées.csv")
+
+
+    accords_infos.to_csv(db_path,index=False)
 
     print("Csv créé avec succcès.")

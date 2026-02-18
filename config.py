@@ -1,6 +1,12 @@
 import boto3
+import os
+import sys
 
-DOWNLOAD_PATH = "C:\\Dev\\Bridge\\Texts"
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+DOWNLOAD_PATH = os.path.join(base_dir, "Texts")
+os.makedirs(DOWNLOAD_PATH, exist_ok=True)
+
 s3 = boto3.client("s3",endpoint_url = 'https://'+'minio.lab.sspcloud.fr',
                   aws_access_key_id= 'HAGRN7LYRHZUFD5RW212', 
                   aws_secret_access_key= '31Ablou69twQKSFxozSujh8VABzD+lTKt0O7vaeY', 

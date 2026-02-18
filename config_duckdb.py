@@ -1,5 +1,7 @@
 import duckdb
 import config
+import os
+import sys
 from pathlib import Path
 import pandas as pd
 import lxml.etree as ET
@@ -7,10 +9,20 @@ from alive_progress import alive_bar
 
 # Connexion à la base de données DuckDB (création du fichier s'il n'existe pas)
 def connect():
-    conn=duckdb.connect("Bdd/metadonnee.duckdb")
+   
+    
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # Dossier Bdd
+    bdd_dir = os.path.join(base_dir, "Bdd")
+    os.makedirs(bdd_dir, exist_ok=True)  # crée le dossier si absent
+
+    # Chemin complet vers la base
+    db_path = os.path.join(bdd_dir, "metadonnee.duckdb")
+
+    # Connexion (créera la DB si elle n'existe pas)
+    conn = duckdb.connect(db_path)
+
     return conn
-
-
 
 # Création de la table metadonnee dans DuckDB pour indexer les documents
 def create_table_metadata(conn):
