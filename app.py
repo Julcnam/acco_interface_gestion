@@ -59,7 +59,13 @@ def Documents():
     st.write("Liste des documents :")    
 
     # Pagination du DataFrame
-    total_rows = conn.execute("SELECT COUNT(*) FROM metadonnee").fetchone()[0]
+    try:
+        total_rows = conn.execute("SELECT COUNT(*) FROM metadonnee").fetchone()[0]
+    except Exception as err:
+        st.error(f"Erreur lors de la récupération des métadonnées depuis DuckDB. Veuillez vous assurer que la base existe et qu'elle n'est pas vide")
+        return
+    
+        
     page_size = 20
     # Barre de recherche du DataFrame
     search = st.text_input("Recherche")
@@ -76,8 +82,8 @@ def Documents():
     try:
         df = conn.execute(f"SELECT * FROM metadonnee {where if where else ""}  order by date_signature DESC LIMIT {page_size} OFFSET {offset} ").df()
 
-    except Exception as e:
-        st.error(f"Erreur lors de la récupération des métadonnées depuis DuckDB : {e}")
+    except Exception as err:
+        st.error(f"Erreur lors de la récupération des métadonnées depuis DuckDB : {err}")
         return
     
 
