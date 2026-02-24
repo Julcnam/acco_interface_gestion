@@ -35,10 +35,15 @@ def Configuration():
         config_fichiers.ensure_conversion_txt()
         st.success("Téléchargement, extraction et conversion terminés.")
 
-     # Connexion à MinIO et téléversement des fichiers .txt
-    if st.button("Téléverser les fichiers vers MinIO onyxia"):
+    # Connexion à MinIO et téléversement des fichiers .txt
+    if st.button("Téléverser les fichiers vers le serveur MinIO Onyxia"):
         config_minio.s3_upload_files(s3_client,s3_bucket)
         st.success("Téléversement vers MinIO onyxia terminé.")
+    
+    # Connexion à MinIO et suppression des fichiers .txt
+    # if st.button("Supprimer les fichiers du serveur MinIO Onyxia"):
+    #     config_minio.s3_delete_files(s3_client,s3_bucket)
+    #     st.success("Suppression vers MinIO onyxia terminé.")
 
     # Connexion à DuckDB et insertion des métadonnées
     if st.button("Insérer les métadonnées dans DuckDB"):
