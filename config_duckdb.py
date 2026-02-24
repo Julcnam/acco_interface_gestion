@@ -108,3 +108,30 @@ def insert_metadata(conn):
             finally:
                 bar()
     print("Insertion des métadonnées terminée.")
+
+
+
+
+    
+# Insertion des métadonnées dans la table 'metadonnee'
+# def insert_metadata(conn):
+#     print("Insertion des métadonnées dans la table 'metadonnee'...")
+#     df = pd.DataFrame()
+#     base_path = Path(config.DOWNLOAD_PATH)
+#     xml_files = [p for p in base_path.rglob("*.xml") if p.is_file()]
+#     if not xml_files:
+#         print("Aucun fichier XML trouvé.")
+#         return
+#     with alive_bar(len(xml_files), title="Conversion xml en df ...") as bar:
+#         for path in xml_files:
+#             try:
+#                 df.append(read_xml_to_df(path))
+#             except Exception as e:
+#                 print(f"Erreur avec {path.name} : {e}")
+#             finally:
+#                 bar()
+
+#     conn.register("df", df)
+#     conn.executemany(""" INSERT INTO metadonnee SELECT * FROM df d WHERE NOT EXISTS ( SELECT 1 FROM metadonnee m WHERE m.reference = d.reference )""")
+#     conn.unregister("df")
+#     print("Insertion des métadonnées terminée.")

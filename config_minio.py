@@ -67,14 +67,13 @@ def s3_upload_files(s3_client, s3_bucket):
 # Suppression des fichiers .txt du Bucket MinIO onyxia
 def s3_delete_files(s3_client, s3_bucket):
     print("Suppression des fichiers en cours...")
-    bucket=s3_client.Bucket(s3_bucket)
-    try :
-        bucket.objects.filter(Prefix="Texts/").delete()
+    paginator = s3_client.get_paginator("list_objects_v2")
     
-    except ClientError as err:
-        error_code = int(err.response["Error"]["Code"])
-        print ("Error: "+error_code)
-    
+    for page in  paginator.paginate(Bucket=s3_bucket):
+        if "Contents" in page:
+            object = [{"Key": obj["Key"]} for obj in page["Contents"]]
+            s3_client.delete_objects(Bucket=s3_bucket,Delete={"Objects": object})
+
     print("Suppression terminée")
 
 
