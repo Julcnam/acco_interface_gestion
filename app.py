@@ -16,6 +16,14 @@ conn = config_duckdb.connect()
 # Configuration de la page Streamlit en mode large
 st.set_page_config(layout="wide")
 
+@st.dialog("Êtes-vous sûr de vouloir supprimer les fichiers du serveur MinIO Onyxia ?")
+def confirmer():
+    if st.button("Confirmer la suppression", type="primary"):
+        config_minio.s3_delete_files(s3_client,s3_bucket)
+        st.success("Suppression vers MinIO onyxia terminé.")
+  
+
+
 # Définitions des pages de l'application Streamlit
 # Page d'accueil
 def Accueil():
@@ -41,9 +49,9 @@ def Scripts():
         st.success("Téléversement vers MinIO onyxia terminé.")
     
     # Connexion à MinIO et suppression des fichiers .txt
-    if st.button("Supprimer les fichiers du serveur MinIO Onyxia"):
-        config_minio.s3_delete_files(s3_client,s3_bucket)
-        st.success("Suppression vers MinIO onyxia terminé.")
+    if st.button("Supprimer les fichiers du serveur MinIO Onyxia",type="primary"):
+        confirmer()
+        
 
     # Connexion à DuckDB et insertion des métadonnées
     if st.button("Insérer les métadonnées dans DuckDB"):
@@ -58,10 +66,10 @@ def Scripts():
     
 
 
-# Page des documents
-def Documents():
-    st.title("Documents")
-    st.write("Liste des documents :")    
+# Page des fichiers et de leurs métadonnées
+def Fichiers():
+    st.title("Fichiers")
+    st.write("Liste des fichiers :")    
 
     # Pagination du DataFrame
     try:
@@ -121,9 +129,12 @@ def Documents():
         st.text_area("Contenu du document", value=text, height=300, label_visibility="collapsed")
                     
 
-
+def Documentation():
+    st.title("Documentation")
+    st.write("Documentation de l'application :")
+    st.pdf("readme.pdf",height=800)
 
 # Configuration de la navigation entre les pages
-nav = st.navigation([Accueil, Scripts, Documents],)
+nav = st.navigation([Accueil, Scripts, Fichiers, Documentation],)
 # Lancement de l'application Streamlit 
 nav.run()
