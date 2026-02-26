@@ -24,9 +24,9 @@ def Accueil():
     st.write("Elle est basée sur un script Python qui automatise le téléchargement, l'extraction, le téléversement et l'insertion des métadonnées.")
     st.write("Elle permet aussi de consulter les documents stockés dans MinIO et leurs métadonnées dans DuckDB ainsi que d'en extraire un csv en damier.")
 
-# Page de configuration
-def Configuration():
-    st.title("Configuration")
+# Page de scripts
+def Scripts():
+    st.title("Scripts")
 
     # Gestion des fichiers : téléchargement et extraction
     if st.button("Télécharger, extraire et convertir les fichiers .docx"):
@@ -124,6 +124,6 @@ def Documents():
 
 
 # Configuration de la navigation entre les pages
-nav = st.navigation([Accueil, Configuration, Documents],)
+nav = st.navigation([Accueil, Scripts, Documents],)
 # Lancement de l'application Streamlit 
 nav.run()

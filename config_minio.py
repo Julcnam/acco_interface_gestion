@@ -70,10 +70,15 @@ def s3_delete_files(s3_client, s3_bucket):
     paginator = s3_client.get_paginator("list_objects_v2")
     
     for page in  paginator.paginate(Bucket=s3_bucket):
+
         if "Contents" in page:
             object = [{"Key": obj["Key"]} for obj in page["Contents"]]
-            s3_client.delete_objects(Bucket=s3_bucket,Delete={"Objects": object})
-
+            with alive_bar(len(object), title="Suppression...") as bar:
+                for obj in object:
+                    s3_client.delete_objects(Bucket=s3_bucket,Delete={"Objects": [obj]})
+                    print(f"{obj['Key']} supprimé.")
+                    bar()
+    
     print("Suppression terminée")
 
 
