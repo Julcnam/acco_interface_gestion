@@ -8,6 +8,8 @@ import config
 from docx import Document
 import os
 from alive_progress import alive_bar
+from odf.opendocument import load
+from odf.text import P
 
 
 # Chemin de téléchargement des fichiers
@@ -108,25 +110,61 @@ def docx_to_txt(docx_path, txt_path):
 
         print(f"Conversion réussie : {txt_path}")
 
-    except Exception as e:
-        print(f"Erreur lors de la conversion : {e}")
+    except Exception as err:
+        print(f"Erreur lors de la conversion : {err}")
+        
+
+def odt_to_txt(docx_path, txt_path):       
+    try:
+
+        doc = load(docx_path)
+        paragraphs = doc.getElementsByType(P)
+
+        full_text =[]
+
+        for para in paragraphs:
+            full_text.append("".join(node.data for node in para.childNodes if node.nodeType == node.TEXT_NODE))
+
+
+        # Écriture dans le fichier TXT
+        with open(txt_path, "w", encoding="utf-8") as txt_file:
+            txt_file.write("\n".join(full_text))
+
+        print(f"Conversion réussie : {txt_path}")
+
+    except Exception as err:
+        print(f"Erreur lors de la conversion : {err}")
+
 
 
 def ensure_conversion_txt():
     base_path = Path(config.DOWNLOAD_PATH)
+    
     docx_files = [
         path for path in base_path.rglob("*.docx")
         if path.is_file() and not path.with_suffix(".txt").exists()
     ]
 
-    if not docx_files:
+    odt_files = [
+        path for path in base_path.rglob("*.odt")
+        if path.is_file() and not path.with_suffix(".txt").exists()
+    ]
+
+    if not docx_files and not odt_files:
         print("Aucun fichier à convertir.")
         return
 
-    with alive_bar(len(docx_files), title="Conversion...") as bar:
+    with alive_bar(len(docx_files), title="Conversion docx ...") as bar:
         for path in docx_files:
             txt_path = path.with_suffix(".txt")
             docx_to_txt(str(path), str(txt_path))
+            path.unlink()
+            bar()
+
+    with alive_bar(len(odt_files), title="Conversion odt ...") as bar:
+        for path in odt_files:
+            txt_path = path.with_suffix(".txt")
+            odt_to_txt(str(path), str(txt_path))
             path.unlink()
             bar()
 
