@@ -2,7 +2,7 @@ import config
 from pathlib import Path
 from alive_progress import alive_bar
 from botocore.exceptions import ClientError
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Connexion au serveur MinIO
 def s3_connect():
@@ -42,27 +42,26 @@ def s3_upload_files(s3_client, s3_bucket):
     # Récupération des objets existants
     existing_objects = set()
     paginator = s3_client.get_paginator("list_objects_v2")
-
     for page in paginator.paginate(Bucket=s3_bucket):
         for obj in page.get("Contents", []):
             existing_objects.add(obj["Key"])
 
     with alive_bar(len(txt_files), title="Téléversement...") as bar:
-        for path in txt_files:
-            # object = path.relative_to(base_path).as_posix()
-            object_name = "Texts/"+path.relative_to(base_path).name
-
-            if object_name in existing_objects:
-                print(f"{object_name} existe déjà.")
-            else:
-                s3_client.upload_file(str(path), s3_bucket, object_name)
-                print(f"{object_name} téléversé.")
-                # path.unlink()
-
-            bar()
-
+       with ThreadPoolExecutor(max_workers=32) as executor:  # ajuster celon le réseau/cpu
+            futures = {executor.submit(upload_file_if_needed, s3_client, s3_bucket, base_path, path, existing_objects): path for path in txt_files}
+            for future in as_completed(futures):
+                # message = future.result()  # on peut récupérer le message de chaque upload si besoin
+                bar()
+            
     print("Téléversement terminé.")
 
+
+def upload_file_if_needed(s3_client, s3_bucket, base_path, path, existing_objects):
+    object_name = "Texts/" + path.relative_to(base_path).name
+    if object_name in existing_objects:
+        return f"{object_name} existe déjà."
+    s3_client.upload_file(str(path), s3_bucket, object_name)
+    return f"{object_name} téléversé."
 
 # Suppression des fichiers .txt du Bucket MinIO onyxia
 def s3_delete_files(s3_client, s3_bucket):

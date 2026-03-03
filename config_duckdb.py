@@ -102,7 +102,6 @@ def insert_metadata(conn):
                 conn.register("df", df)
                 conn.execute(""" INSERT INTO metadonnee SELECT * FROM df d WHERE NOT EXISTS ( SELECT 1 FROM metadonnee m WHERE m.reference = d.reference )""")
                 conn.unregister("df")
-                print(f"Métadonnées de {path.name} insérées.")
             except Exception as e:
                 print(f"Erreur avec {path.name} : {e}")
             finally:

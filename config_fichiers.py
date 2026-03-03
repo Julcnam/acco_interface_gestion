@@ -79,13 +79,11 @@ def ensure_extract_files():
             extract_dir = download_dir / archive.stem.replace(".tar", "")
             extract_dir.mkdir(exist_ok=True)
 
-            print(f"Extraction de {archive.name} vers {extract_dir}...")
-
             with tarfile.open(archive, "r:gz") as tar:
                 tar.extractall(path=extract_dir)
 
             archive.unlink()
-            print(f"{archive.name} extrait et supprimé.")
+            
             bar()
 
     print("Extraction terminée.")
@@ -109,8 +107,6 @@ def docx_to_txt(docx_path, txt_path):
         with open(txt_path, "w", encoding="utf-8") as txt_file:
             txt_file.write("\n".join(full_text))
 
-        print(f"Conversion réussie : {txt_path}")
-
     except Exception as err:
         print(f"Erreur lors de la conversion : {err}")
         
@@ -133,8 +129,6 @@ def odt_to_txt(odt_path, txt_path):
         # Écriture dans le fichier TXT
         with open(txt_path, "w", encoding="utf-8") as txt_file:
             txt_file.write("\n".join(full_text))
-
-        print(f"Conversion réussie : {txt_path}")
 
     except Exception as err:
         print(f"Erreur lors de la conversion : {err}")
