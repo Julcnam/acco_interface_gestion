@@ -10,6 +10,7 @@ import os
 from alive_progress import alive_bar
 from odf.opendocument import load
 from odf.text import P
+from odf import teletype
 
 
 # Chemin de téléchargement des fichiers
@@ -114,16 +115,19 @@ def docx_to_txt(docx_path, txt_path):
         print(f"Erreur lors de la conversion : {err}")
         
 
-def odt_to_txt(docx_path, txt_path):       
+def odt_to_txt(odt_path, txt_path):       
     try:
-
-        doc = load(docx_path)
+        # Lecture du fichier ODT
+        doc = load(odt_path)
         paragraphs = doc.getElementsByType(P)
 
-        full_text =[]
+        full_text = []
 
+        # Extraction du texte
         for para in paragraphs:
-            full_text.append("".join(node.data for node in para.childNodes if node.nodeType == node.TEXT_NODE))
+            text = teletype.extractText(para)
+            if text.strip():
+                full_text.append(text)
 
 
         # Écriture dans le fichier TXT
@@ -139,7 +143,7 @@ def odt_to_txt(docx_path, txt_path):
 
 def ensure_conversion_txt():
     base_path = Path(config.DOWNLOAD_PATH)
-    
+
     docx_files = [
         path for path in base_path.rglob("*.docx")
         if path.is_file() and not path.with_suffix(".txt").exists()

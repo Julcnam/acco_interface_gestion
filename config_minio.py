@@ -68,17 +68,24 @@ def s3_upload_files(s3_client, s3_bucket):
 def s3_delete_files(s3_client, s3_bucket):
     print("Suppression des fichiers en cours...")
     paginator = s3_client.get_paginator("list_objects_v2")
+
+    all_objects = []
     
     for page in  paginator.paginate(Bucket=s3_bucket):
-
         if "Contents" in page:
-            object = [{"Key": obj["Key"]} for obj in page["Contents"]]
-            with alive_bar(len(object), title="Suppression...") as bar:
-                for obj in object:
-                    s3_client.delete_objects(Bucket=s3_bucket,Delete={"Objects": [obj]})
-                    print(f"{obj['Key']} supprimé.")
-                    bar()
-    
+            all_objects.extend({"Key": obj["Key"]} for obj in page["Contents"])
+
+    if not all_objects:
+            print("Bucket vide")
+            return
+
+
+    with alive_bar(len(all_objects), title="Suppression...") as bar:
+        for i in range(0,len(all_objects),1000):
+            batch = all_objects[i:i+1000]
+            s3_client.delete_objects(Bucket=s3_bucket,Delete={"Objects": batch,"Quiet": True})
+            bar(len(batch))
+
     print("Suppression terminée")
 
 
