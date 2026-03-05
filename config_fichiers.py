@@ -1,3 +1,6 @@
+from email.mime import text
+from pydoc import doc
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
@@ -11,6 +14,8 @@ from alive_progress import alive_bar
 from odf.opendocument import load
 from odf.text import P
 from odf import teletype
+import docx2txt
+
 
 
 # Chemin de téléchargement des fichiers
@@ -94,19 +99,10 @@ def docx_to_txt(docx_path, txt_path):
         if not os.path.isfile(docx_path):
             raise FileNotFoundError(f"Fichier introuvable : {docx_path}")
 
-        # Lecture du fichier DOCX
-        doc = Document(docx_path)
-
-        # Extraction du texte
-        full_text = []
-        for para in doc.paragraphs:
-            if para.text.strip():  # Ignorer les lignes vides
-                full_text.append(para.text)
-
-        # Écriture dans le fichier TXT
-        with open(txt_path, "w", encoding="utf-8") as txt_file:
-            txt_file.write("\n".join(full_text))
-
+        text = docx2txt.process(docx_path)
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(text)
+      
     except Exception as err:
         print(f"Erreur lors de la conversion : {err}")
         
@@ -132,10 +128,14 @@ def odt_to_txt(odt_path, txt_path):
 
     except Exception as err:
         print(f"Erreur lors de la conversion : {err}")
-
-
-
+        
+        
+        
 def ensure_conversion_txt():
+    cpt_fichier=0
+    cpt_doublon=0
+    cpt_vide=0
+    doublon = set()
     base_path = Path(config.DOWNLOAD_PATH)
 
     docx_files = [
@@ -147,6 +147,7 @@ def ensure_conversion_txt():
         path for path in base_path.rglob("*.odt")
         if path.is_file() and not path.with_suffix(".txt").exists()
     ]
+
 
     if not docx_files and not odt_files:
         print("Aucun fichier à convertir.")
@@ -166,5 +167,20 @@ def ensure_conversion_txt():
             path.unlink()
             bar()
 
-    print("Conversion terminée.")
+    
+    for path in base_path.rglob("*")  :
+
+        if path.is_file() and path.suffix == ".txt":
+            cpt_fichier+=1
+        
+        if path.name in doublon:
+            cpt_doublon+=1
+        else:
+            doublon.add(path.name)
+
+        if  path.is_file and path.stat().st_size < 250:
+            cpt_vide+=1
+            
+
+    print(f"Conversion terminée, nombre de fichiers: {cpt_fichier}, nombre de doublons : {cpt_doublon}, nombre de fichiers vide : {cpt_vide}")
            

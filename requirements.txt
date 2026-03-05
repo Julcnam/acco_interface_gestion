@@ -13,3 +13,4 @@ alive-progress
 boto3
 botocore
 odfpy
+docx2txt

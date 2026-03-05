@@ -47,7 +47,7 @@ def s3_upload_files(s3_client, s3_bucket):
             existing_objects.add(obj["Key"])
 
     with alive_bar(len(txt_files), title="Téléversement...") as bar:
-       with ThreadPoolExecutor(max_workers=32) as executor:  # ajuster celon le réseau/cpu
+       with ThreadPoolExecutor() as executor:  # ajuster celon le réseau/cpu
             futures = {executor.submit(upload_file_if_needed, s3_client, s3_bucket, base_path, path, existing_objects): path for path in txt_files}
             for future in as_completed(futures):
                 # message = future.result()  # on peut récupérer le message de chaque upload si besoin
